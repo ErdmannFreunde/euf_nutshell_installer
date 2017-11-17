@@ -1,0 +1,21 @@
+{
+    "name": "erdmannfreunde/euf_nutshell_installer",
+    "description": "",
+    "keywords": [
+    ],
+    "license": "LGPL-3.0+",
+    "authors": [
+        {
+            "name": "Dennis Erdmann",
+            "email": "dennis@erdmann-freunde.de"
+        }
+    ],
+    "require": {
+        "php": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "EuF\\Nutshell\\Composer\\": "src/"
+        }
+    }
+}
