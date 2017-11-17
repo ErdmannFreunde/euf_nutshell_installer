@@ -13,6 +13,9 @@
     "require": {
         "php": "^5.5 || ^7.0"
     },
+    "require-dev": {
+        "composer/composer": "^1.0@dev"
+    },
     "autoload": {
         "psr-4": {
             "EuF\\Nutshell\\Composer\\": "src/"
