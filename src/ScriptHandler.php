@@ -14,9 +14,6 @@
 namespace EuF\Nutshell\Composer;
 
 use Composer\Script\Event;
-use Composer\Util\Filesystem;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
 
 
 class ScriptHandler
@@ -28,6 +25,7 @@ class ScriptHandler
      */
     public static function initializeNutshell(Event $event)
     {
-        $io = $event->getIO()->write('Hello World');
+        $processor = new Processor($event->getIO());
+        $processor->handle();
     }
 }
