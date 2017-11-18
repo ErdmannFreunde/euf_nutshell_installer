@@ -25,6 +25,16 @@ class Processor
     private $io;
 
     /**
+     * @var \stdClass
+     */
+    private $packageJson;
+
+    /**
+     * @var string
+     */
+    private $gulpfileJs;
+
+    /**
      * Processor constructor.
      *
      * @param IOInterface $io
@@ -44,7 +54,7 @@ class Processor
         }
 
         if (!$this->io->isInteractive()) {
-            // Distribution files are copied. Nothing to do left.
+            // Distribution files are copied. Nothing left to do.
             return;
         }
 
@@ -57,28 +67,92 @@ class Processor
             switch ($param) {
                 case 'package.name':
                     if ($value !== $expectedParams[$param]) {
-                        $json       = json_decode(file_get_contents('package.json'));
-                        $json->name = $value;
-                        file_put_contents('package.json', json_encode($json,JSON_PRETTY_PRINT));
+                        $this->getPackageJson()->name = $value;
                     }
                     break;
                 case 'gulpfile.themePath':
                     if ($value !== $expectedParams[$param]) {
-                        rename($expectedParams[$param], $value);
-                        $file = file_get_contents('gulpfile.js');
-                        preg_replace("/(var $param\s+?\=\s\")(.+?)(\")/", "\$1$value\$3", $file);
-                        file_put_contents('gulpfile.js', $file);
+                        //rename($expectedParams[$param], $value);
+                        $param = str_replace('gulpfile.', '', $param);
+                        $this->replaceGulpfileJsVar($param, $value);
                     }
                     break;
                 case 'gulpfile.bsProxy':
                     if ($value !== $expectedParams[$param]) {
-                        $file = file_get_contents('gulpfile.js');
-                        preg_replace("/(var $param\s+?\=\s\")(.+?)(\")/", "\$1$value\$3", $file);
-                        file_put_contents('gulpfile.js', $file);
+                        $param = str_replace('gulpfile.', '', $param);
+                        $this->replaceGulpfileJsVar($param, $value);
                     }
                     break;
             }
         }
+
+        $this->persistPackageJson();
+        $this->persistGulpfileJs();
+    }
+
+    /**
+     * @return \stdClass
+     */
+    public function getPackageJson()
+    {
+        if (null === $this->packageJson) {
+            $this->packageJson = json_decode(file_get_contents('package.json'));
+        }
+
+        return $this->packageJson;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGulpfileJs()
+    {
+        if (null === $this->gulpfileJs) {
+            $this->gulpfileJs = file_get_contents('gulpfile.js');
+        }
+
+        return $this->gulpfileJs;
+    }
+
+    private function getJsVarRegex($param)
+    {
+        // Matches:
+        // --------
+        // #0: var bsProxy    = "nutshell.localhost";
+        //
+        // #1: var bsProxy    = "
+        // #2: nutshell.localhost
+        // #3: ";
+        return sprintf('/(var %s\\s+?=\\s\\")(.+?)(\\"\\;)/', $param);
+    }
+
+    private function replaceGulpfileJsVar($param, $value)
+    {
+        $this->gulpfileJs = preg_replace($this->getJsVarRegex($param), '$1'.$value.'$3', $this->getGulpfileJs());
+    }
+
+    private function fetchGulpfileJsVar($param)
+    {
+        if (preg_match($this->getJsVarRegex($param), $this->getGulpfileJs(), $matches)) {
+            return $matches[2];
+        }
+
+        return null;
+    }
+
+    private function fetchPackageJsonVar($param)
+    {
+        return $this->getPackageJson()->{$param};
+    }
+
+    private function persistPackageJson()
+    {
+        file_put_contents('package.json', json_encode($this->getPackageJson(), JSON_PRETTY_PRINT));
+    }
+
+    private function persistGulpfileJs()
+    {
+        file_put_contents('gulpfile.js', $this->getGulpfileJs());
     }
 
     private function processParams($expectedParams, $actualParams)
@@ -119,10 +193,9 @@ class Processor
     {
         $expectedParams     = [];
         $configurableParams = ['name'];
-        $json               = json_decode(file_get_contents('package.json.dist'));
 
         foreach ($configurableParams as $param) {
-            $expectedParams['package.'.$param] = $json->{$param};
+            $expectedParams['package.'.$param] = $this->fetchPackageJsonVar($param);
         }
 
         return $expectedParams;
@@ -132,11 +205,9 @@ class Processor
     {
         $expectedParams     = [];
         $configurableParams = ['themePath', 'bsProxy'];
-        $js                 = file_get_contents('gulpfile.js.dist');
 
         foreach ($configurableParams as $param) {
-            preg_match("/var $param\s+?\=\s\"(.+?)\"/", $js, $matches);
-            $expectedParams['gulpfile.'.$param] = $matches[1];
+            $expectedParams['gulpfile.'.$param] = $this->fetchGulpfileJsVar($param);
         }
 
         return $expectedParams;
