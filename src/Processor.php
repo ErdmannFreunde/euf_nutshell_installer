@@ -72,7 +72,7 @@ class Processor
                     break;
                 case 'gulpfile.themePath':
                     if ($value !== $expectedParams[$param]) {
-                        //rename($expectedParams[$param], $value);
+                        rename($expectedParams[$param], $value);
                         $param = str_replace('gulpfile.', '', $param);
                         $this->replaceGulpfileJsVar($param, $value);
                     }
