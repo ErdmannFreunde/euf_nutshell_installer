@@ -14,6 +14,7 @@
 namespace EuF\Nutshell\Composer;
 
 use Composer\Script\Event;
+use Composer\Util\Filesystem;
 
 
 class ScriptHandler
@@ -25,7 +26,7 @@ class ScriptHandler
      */
     public static function initializeNutshell(Event $event)
     {
-        $processor = new Processor($event->getIO());
+        $processor = new Processor($event->getIO(), new Filesystem());
         $processor->handle();
     }
 }
