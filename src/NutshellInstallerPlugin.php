@@ -13,15 +13,38 @@
 
 namespace EuF\Nutshell\Composer;
 
+use Composer\Composer;
+use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\IO\IOInterface;
+use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Util\Filesystem;
 
 
-/**
- * @deprecated To be removed, repository is composer-plugin now
- */
-class ScriptHandler
+class NutshellInstallerPlugin implements PluginInterface, EventSubscriberInterface
 {
+
+    protected $composer;
+    protected $io;
+
+    public function activate(Composer $composer, IOInterface $io)
+    {
+        $this->composer = $composer;
+        $this->io = $io;
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return [
+            'post-update-cmd' => [
+                ['initializeNutshell', 10]
+            ],
+            'post-install-cmd' => [
+                ['initializeNutshell', 10]
+            ],
+        ];
+    }
+
     /**
      * Runs all Composer tasks to initialize the Nutshell kit.
      *

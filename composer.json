@@ -1,17 +1,23 @@
 {
     "name": "erdmannfreunde/euf_nutshell_installer",
+    "type": "composer-plugin",
     "description": "",
     "keywords": [
     ],
-    "license": "LGPL-3.0+",
+    "license": "LGPL-3.0-or-later",
     "authors": [
         {
             "name": "Dennis Erdmann",
             "email": "dennis@erdmann-freunde.de"
+        },
+        {
+            "name": "Richard Henkenjohann",
+            "email": "richardhenkenjohann@googlemail.com"
         }
     ],
     "require": {
-        "php": "^5.5 || ^7.0"
+        "php": "^5.5 || ^7.0",
+        "composer-plugin-api": "^1.1"
     },
     "require-dev": {
         "composer/composer": "^1.0@dev"
@@ -20,5 +26,8 @@
         "psr-4": {
             "EuF\\Nutshell\\Composer\\": "src/"
         }
+    },
+    "extra": {
+        "class": "EuF\\Nutshell\\Composer\\NutshellInstallerPlugin"
     }
 }
