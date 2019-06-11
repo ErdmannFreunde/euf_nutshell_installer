@@ -183,7 +183,7 @@ class Processor
         // #1: var bsProxy    = "
         // #2: nutshell.localhost
         // #3: ";
-        return sprintf('/(var %s\\s+?=\\s\\")(.+?)(\\"\\;)/', $param);
+        return sprintf('/(const %s\\s+?=\\s\\")(.+?)(\\"\\;)/', $param);
     }
 
     /**
