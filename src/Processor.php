@@ -178,12 +178,12 @@ class Processor
     {
         // Matches:
         // --------
-        // #0: var bsProxy    = "nutshell.localhost";
+        // #0: const bsProxy  = 'nutshell.localhost';
         //
-        // #1: var bsProxy    = "
+        // #1: const bsProxy  = '
         // #2: nutshell.localhost
-        // #3: ";
-        return sprintf('/(const %s\\s+?=\\s\\")(.+?)(\\"\\;)/', $param);
+        // #3: ';
+        return sprintf('/(const %s\\s+?=\\s\\["\'])(.+?)(\\["\']\\;)/', $param);
     }
 
     /**
