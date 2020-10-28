@@ -147,7 +147,7 @@ class Processor
     public function getPackageJson()
     {
         if (null === $this->packageJson) {
-            $this->packageJson = json_decode(file_get_contents('package.json'));
+            $this->packageJson = json_decode(file_get_contents('package.json'), false);
         }
 
         return $this->packageJson;
